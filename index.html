@@ -97,11 +97,64 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .dlg .bd{padding:16px 18px;display:flex;flex-direction:column;gap:12px;max-height:70vh;overflow:auto}
 .dlg .ft{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
 .dlg .ft .primary{width:auto;margin:0;padding:9px 20px;font-size:14px}
+.dlg .ft{flex-wrap:wrap}
+.dlg .ft button{white-space:nowrap}
 .when{background:var(--red-l);color:var(--red-d);border-radius:8px;padding:9px 12px;font-weight:700}
 .people{display:flex;flex-wrap:wrap;gap:5px}
 .pill{background:#f0f0f2;border-radius:99px;padding:2px 10px;font-size:12px}
 .pill.busy{background:var(--warn-l);color:var(--warn)}
 .err{color:#b3261e;font-size:13px}
+.rcustom{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-top:8px;display:flex;flex-direction:column;gap:10px;background:#fafafb}
+.rrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+.rrow>span{color:var(--muted);min-width:6em}
+.rrow input[type=number],.rrow input[type=date],.rrow select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+.days{display:flex;gap:5px}
+.dbtn{width:30px;height:30px;border-radius:50%;border:1px solid var(--gray);background:#fff;cursor:pointer;font-size:13px;padding:0;color:var(--ink)}
+.dbtn.on{background:var(--red);color:#fff;border-color:var(--red)}
+.ends{display:flex;flex-direction:column;gap:6px}
+.ends label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.ends input[type=radio]{accent-color:var(--red)}
+details.perm{font-size:13px}
+details.perm summary{cursor:pointer;color:var(--muted)}
+details.perm .checks{margin-top:8px}
+#rSummary b{color:var(--red-d)}
+dialog.dlg.wide{width:min(780px,96vw)}
+.tabs{display:flex;border-bottom:1px solid var(--line);background:#fafafb}
+.tab{flex:1;padding:10px;border:none;background:none;cursor:pointer;font-weight:700;color:var(--muted);border-bottom:3px solid transparent}
+.tab.on{color:var(--red);border-bottom-color:var(--red);background:#fff}
+.btoolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btoolbar input[type=search]{flex:1;min-width:150px;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+.btable{border:1px solid var(--line);border-radius:6px;max-height:44vh;overflow:auto}
+.brow{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) 124px 30px;grid-template-areas:"n e k x";gap:6px;padding:6px 8px;border-bottom:1px solid #f0f0f2;align-items:center}
+.brow .bn{grid-area:n}.brow .be{grid-area:e}.brow .bk{grid-area:k}.brow .xbtn{grid-area:x}
+.brow input,.brow select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;width:100%;min-width:0;background:#fff;color:var(--ink)}
+.brow.head{position:sticky;top:0;background:#fafafb;font-size:12px;color:var(--muted);font-weight:700;z-index:1}
+.brow input.bad,.brow select.bad{border-color:#b3261e;background:#fdecea}
+.xbtn{border:none;background:none;color:var(--muted);cursor:pointer;font-size:20px;line-height:1;padding:0}
+.xbtn:hover{color:#b3261e}
+.pastebox{border:1px dashed var(--gray);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.pastebox textarea{padding:8px;border:1px solid var(--line);border-radius:6px;min-height:110px;font:inherit;background:#fff;color:var(--ink)}
+.pastebox select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+#bmMsg{margin:8px 0 0;min-height:1em;color:var(--ok)}
+#bmMsg.warn{color:var(--warn)}
+#bmList{margin-top:8px}
+.gsplit{display:grid;grid-template-columns:230px minmax(0,1fr);gap:14px}
+.glist{border:1px solid var(--line);border-radius:6px;max-height:42vh;overflow:auto}
+.gitem{display:flex;align-items:center;gap:4px;padding:7px 8px;border-bottom:1px solid #f0f0f2;cursor:pointer}
+.gitem.on{background:var(--red-l);font-weight:700}
+.gitem.bad .gn{color:#b3261e}
+.gitem .gn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gitem .gc{color:var(--muted);font-size:12px;font-weight:400}
+.gitem .mv{border:none;background:none;cursor:pointer;color:var(--muted);padding:0 3px;font-size:11px}
+.gitem .mv:hover{color:var(--red)}
+.danger{border:1px solid #b3261e;color:#b3261e;background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px}
+.danger:hover{background:#fdecea}
+#bgName.bad{border-color:#b3261e;background:#fdecea}
+@media(max-width:640px){
+  .gsplit{grid-template-columns:minmax(0,1fr)}
+  .brow{grid-template-columns:minmax(0,1fr) 30px;grid-template-areas:"n x" "e x" "k x"}
+  .brow.head{display:none}
+}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#232326;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;display:none;max-width:92vw;z-index:50;box-shadow:0 6px 24px rgba(0,0,0,.3)}
 #toast a{color:#ffd1dd}
 </style>
@@ -118,7 +171,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 <div class="layout">
   <div>
     <section class="card">
-      <h2><span class="step">1</span>参加者を選ぶ</h2>
+      <h2><span class="step">1</span>参加者を選ぶ<button class="link" id="bookBtn" type="button" style="margin-left:auto">アドレス帳を編集</button></h2>
       <div class="groups" id="groups"></div>
       <input class="search" id="q" type="search" placeholder="名前・アドレスで絞り込み">
       <div class="memlist" id="memlist"></div>
@@ -167,21 +220,75 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 </div>
 
 <dialog class="dlg" id="createDlg">
-  <div class="hd" id="cHd">この日時で予定を作成</div>
+  <div class="hd" id="cHd">予定を作成</div>
   <div class="bd">
+    <label class="f">タイトル<input type="text" id="cTitle" placeholder="タイトルを追加"></label>
+
     <div class="when" id="cWhen"></div>
-    <div class="grid" id="cDirect" style="display:none">
-      <label class="f full">日付<input type="date" id="dDate"></label>
-      <label class="f">開始<input type="time" id="dStart" step="900"></label>
-      <label class="f">終了<input type="time" id="dEnd" step="900"></label>
+    <div id="cDirect" style="display:none">
+      <div class="grid">
+        <label class="f">開始日<input type="date" id="dDate"></label>
+        <label class="f" id="dEndDateWrap" style="display:none">終了日<input type="date" id="dEndDate"></label>
+      </div>
+      <div class="grid" id="dTimeRow">
+        <label class="f">開始時刻<input type="time" id="dStart" step="900"></label>
+        <label class="f">終了時刻<input type="time" id="dEnd" step="900"></label>
+      </div>
+      <div class="checks" style="margin-top:8px"><label><input type="checkbox" id="dAllDay">終日</label></div>
     </div>
-    <label class="f">タイトル<input type="text" id="cTitle" placeholder="例:週次ミーティング"></label>
+
+    <div>
+      <label class="f">繰り返し<select id="rKind"></select></label>
+      <div class="small muted" id="rSummary" style="margin-top:4px"></div>
+      <div class="rcustom" id="rCustom" style="display:none">
+        <div class="rrow">
+          <span>繰り返す間隔</span>
+          <input type="number" id="rInterval" min="1" max="99" value="1" style="width:4.5em">
+          <select id="rUnit">
+            <option value="DAILY">日</option><option value="WEEKLY" selected>週間</option>
+            <option value="MONTHLY">か月</option><option value="YEARLY">年</option>
+          </select>
+        </div>
+        <div class="rrow" id="rDaysRow"><span>繰り返す曜日</span><div class="days" id="rDays"></div></div>
+        <div class="rrow" id="rMonthRow"><span>繰り返す日</span><select id="rMonthMode"></select></div>
+        <div class="rrow">
+          <span>終了</span>
+          <div class="ends">
+            <label><input type="radio" name="rEnd" value="never" checked>なし</label>
+            <label><input type="radio" name="rEnd" value="until">日付 <input type="date" id="rUntil"></label>
+            <label><input type="radio" name="rEnd" value="count">回数 <input type="number" id="rCount" min="1" max="999" value="13" style="width:4.5em"> 回</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <label class="f">場所<input type="text" id="cLoc" placeholder="例:会議室1 / オンライン"></label>
-    <label class="f">メモ<textarea id="cDesc" rows="3"></textarea></label>
+    <label class="f">説明<textarea id="cDesc" rows="3"></textarea></label>
     <div class="checks">
       <label><input type="checkbox" id="cMeet">Google Meetのリンクを付ける</label>
       <label id="cSkipWrap"><input type="checkbox" id="cSkipBusy">この時間に予定がある方は招待しない</label>
     </div>
+
+    <div class="grid">
+      <label class="f">通知<select id="cRemind"></select></label>
+      <label class="f">公開設定
+        <select id="cVis">
+          <option value="default">デフォルトの公開設定</option><option value="public">公開</option><option value="private">非公開</option>
+        </select>
+      </label>
+      <label class="f">予定の状態
+        <select id="cAvail"><option value="opaque">予定あり</option><option value="transparent">空き時間</option></select>
+      </label>
+    </div>
+    <details class="perm">
+      <summary>ゲストの権限</summary>
+      <div class="checks">
+        <label><input type="checkbox" id="gModify">予定を変更</label>
+        <label><input type="checkbox" id="gInvite" checked>ゲストを招待</label>
+        <label><input type="checkbox" id="gSee" checked>ゲストリストを表示</label>
+      </div>
+    </details>
+
     <div>
       <div class="small muted" style="margin-bottom:5px">招待する参加者(予定ありの方は黄色)</div>
       <div class="people" id="cPeople"></div>
@@ -191,6 +298,65 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   <div class="ft">
     <button class="secondary" id="cCancel" type="button">キャンセル</button>
     <button class="primary" id="cOk" type="button">予定を作成して招待を送る</button>
+  </div>
+</dialog>
+
+<dialog class="dlg wide" id="bookDlg">
+  <div class="hd">アドレス帳の編集</div>
+  <div class="tabs">
+    <button type="button" class="tab on" data-tab="members">メンバー</button>
+    <button type="button" class="tab" data-tab="groups">グループ</button>
+  </div>
+  <div class="bd">
+    <div id="paneMembers">
+      <div class="btoolbar">
+        <input type="search" id="bmQ" placeholder="名前・アドレスで絞り込み">
+        <button class="secondary" id="bmAdd" type="button">＋ メンバーを追加</button>
+        <button class="secondary" id="bmPaste" type="button">貼り付けで一括追加</button>
+      </div>
+      <div class="pastebox" id="bmPasteBox" style="display:none">
+        <div class="small muted">1行に1人。「名前 [タブ/カンマ] メールアドレス」の形式で貼り付けてください(Excelやスプレッドシートからのコピーもそのまま使えます。メールアドレスのない行は読み飛ばします)。</div>
+        <textarea id="bmPasteText" placeholder="例:&#10;小山	chibo.koyama@gmail.com&#10;河田	chibo.kawata@gmail.com"></textarea>
+        <div class="btoolbar">
+          <label class="small">追加する種類
+            <select id="bmPasteKind"><option value="staff">社員</option><option value="room">会議室・設備</option></select>
+          </label>
+          <span style="flex:1"></span>
+          <button class="secondary" id="bmPasteCancel" type="button">閉じる</button>
+          <button class="primary" id="bmPasteGo" type="button" style="width:auto;margin:0;padding:8px 16px;font-size:14px">追加する</button>
+        </div>
+      </div>
+      <div class="small" id="bmMsg"></div>
+      <div class="btable" id="bmList"></div>
+      <div class="small muted" id="bmCount"></div>
+    </div>
+
+    <div id="paneGroups" style="display:none">
+      <div class="gsplit">
+        <div>
+          <div class="glist" id="bgList"></div>
+          <button class="secondary" id="bgAdd" type="button" style="width:100%;margin-top:8px">＋ グループを追加</button>
+        </div>
+        <div id="bgEdit">
+          <label class="f">グループ名<input type="text" id="bgName" maxlength="30" placeholder="例:営業推進本部"></label>
+          <div class="btoolbar" style="margin-top:10px">
+            <input type="search" id="bgQ" placeholder="メンバーを絞り込み">
+            <button class="link" id="bgAllStaff" type="button">社員すべて</button>
+            <button class="link" id="bgClear" type="button">クリア</button>
+          </div>
+          <div class="memlist" id="bgMembers" style="margin-top:8px"></div>
+          <div class="selbar"><div class="selsum" id="bgCount"></div>
+            <button class="danger" id="bgDel" type="button">このグループを削除</button></div>
+        </div>
+        <div class="empty small" id="bgEmpty" style="display:none">グループがありません。「＋ グループを追加」で作成します。</div>
+      </div>
+    </div>
+    <div class="err" id="bkErr"></div>
+  </div>
+  <div class="ft">
+    <button class="link" id="bkReset" type="button" style="margin-right:auto">初期値に戻す</button>
+    <button class="secondary" id="bkCancel" type="button">キャンセル</button>
+    <button class="primary" id="bkSave" type="button">保存</button>
   </div>
 </dialog>
 
@@ -211,6 +377,153 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 <div id="toast"></div>
 
 <script src="core.js"></script>
+<script>
+/* 繰り返し設定(Googleカレンダー準拠)。core.js の jstParts_ / jstToMs_ / jstDateStr_ / DAY_MS に依存 */
+window.Recur = (function () {
+  var DOW = ['日', '月', '火', '水', '木', '金', '土'];
+  var CODE = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+  function parts(dateStr) {
+    var p = jstParts_(jstToMs_(dateStr, 0, 0));
+    var dim = new Date(Date.UTC(p.y, p.m, 0)).getUTCDate();
+    p.nth = Math.ceil(p.d / 7);          // 第N曜日
+    p.isLast = p.d + 7 > dim;            // その月の最終◯曜日か
+    return p;
+  }
+
+  // 「繰り返さない / 毎日 / 毎週◯曜日 / 毎月 第N◯曜日 / 毎年 / 毎週平日 / カスタム」
+  function options(dateStr) {
+    var p = parts(dateStr), w = DOW[p.dow] + '曜日', out = [];
+    out.push({ key: 'none', label: '繰り返さない' });
+    out.push({ key: 'daily', label: '毎日' });
+    out.push({ key: 'weekly', label: '毎週 ' + w });
+    if (p.nth <= 4) out.push({ key: 'monthlyNth', label: '毎月 第' + p.nth + w });
+    if (p.isLast) out.push({ key: 'monthlyLast', label: '毎月 最終' + w });
+    out.push({ key: 'yearly', label: '毎年 ' + p.m + '月' + p.d + '日' });
+    out.push({ key: 'weekdays', label: '毎週平日(月〜金)' });
+    out.push({ key: 'custom', label: 'カスタム…' });
+    return out;
+  }
+
+  // カスタム(毎月)で選べるパターン
+  function monthModes(dateStr) {
+    var p = parts(dateStr), w = DOW[p.dow] + '曜日', out = [];
+    out.push({ key: 'day', label: '毎月 ' + p.d + '日' });
+    if (p.nth <= 4) out.push({ key: 'nth', label: '毎月 第' + p.nth + w });
+    if (p.isLast) out.push({ key: 'last', label: '毎月 最終' + w });
+    return out;
+  }
+
+  function nextMatching(dateStr, days) {
+    var base = jstToMs_(dateStr, 0, 0);
+    for (var i = 0; i < 7; i++) {
+      if (days.indexOf(jstParts_(base + i * DAY_MS).dow) >= 0) return jstDateStr_(base + i * DAY_MS);
+    }
+    return dateStr;
+  }
+
+  function cleanDays(days) {
+    var seen = {}, out = [];
+    (days || []).forEach(function (d) {
+      d = Number(d);
+      if (d >= 0 && d <= 6 && !seen[d]) { seen[d] = true; out.push(d); }
+    });
+    return out.sort(function (a, b) { return a - b; });
+  }
+
+  function ymd(dateStr) { return dateStr.replace(/-/g, ''); }
+
+  /*
+   * spec: { kind, custom: { interval, unit('DAILY'|'WEEKLY'|'MONTHLY'|'YEARLY'), days:[0-6],
+   *          monthMode('day'|'nth'|'last'), end:{ type:'never'|'until'|'count', until:'YYYY-MM-DD', count:n } } }
+   * 戻り値: { rrule:[...], firstDate:'YYYY-MM-DD', error:'' }
+   */
+  function build(spec, dateStr, allDay) {
+    var p = parts(dateStr), c = spec.custom || {}, rule, first = dateStr;
+    var res = function (r, f) { return { rrule: r ? ['RRULE:' + r] : [], firstDate: f || dateStr, error: '' }; };
+    var err = function (m) { return { rrule: [], firstDate: dateStr, error: m }; };
+
+    switch (spec.kind) {
+      case 'none': return res('');
+      case 'daily': return res('FREQ=DAILY');
+      case 'weekly': return res('FREQ=WEEKLY;BYDAY=' + CODE[p.dow]);
+      case 'monthlyNth': return res('FREQ=MONTHLY;BYDAY=' + p.nth + CODE[p.dow]);
+      case 'monthlyLast': return res('FREQ=MONTHLY;BYDAY=-1' + CODE[p.dow]);
+      case 'yearly': return res('FREQ=YEARLY');
+      case 'weekdays': return res('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR', nextMatching(dateStr, [1, 2, 3, 4, 5]));
+      case 'custom': break;
+      default: return err('繰り返しの設定が不正です');
+    }
+
+    var n = Math.floor(Number(c.interval));
+    if (!(n >= 1 && n <= 99)) return err('繰り返す間隔は1〜99で指定してください');
+    if (['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'].indexOf(c.unit) < 0) return err('繰り返しの単位が不正です');
+    rule = 'FREQ=' + c.unit + (n > 1 ? ';INTERVAL=' + n : '');
+
+    if (c.unit === 'WEEKLY') {
+      var days = cleanDays(c.days);
+      if (!days.length) return err('繰り返す曜日を1つ以上選んでください');
+      rule += ';BYDAY=' + days.map(function (d) { return CODE[d]; }).join(',');
+      first = nextMatching(dateStr, days);
+    } else if (c.unit === 'MONTHLY') {
+      if (c.monthMode === 'nth' && p.nth <= 4) rule += ';BYDAY=' + p.nth + CODE[p.dow];
+      else if (c.monthMode === 'last' && p.isLast) rule += ';BYDAY=-1' + CODE[p.dow];
+      else rule += ';BYMONTHDAY=' + p.d;
+    }
+
+    var e = c.end || { type: 'never' };
+    if (e.type === 'until') {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(e.until || '')) return err('繰り返しの終了日を入力してください');
+      if (e.until < first) return err('繰り返しの終了日は、開始日以降にしてください');
+      // 時間指定の予定: 終了日の日本時間23:59:59 = 同日14:59:59(UTC)
+      rule += ';UNTIL=' + ymd(e.until) + (allDay ? '' : 'T145959Z');
+    } else if (e.type === 'count') {
+      var k = Math.floor(Number(e.count));
+      if (!(k >= 1 && k <= 999)) return err('繰り返しの回数は1〜999で指定してください');
+      rule += ';COUNT=' + k;
+    }
+    return res(rule, first);
+  }
+
+  // 画面に出す説明文(例: 毎週 月・水曜日、2週間ごと)
+  function describe(spec, dateStr) {
+    var p = parts(dateStr), w = DOW[p.dow] + '曜日', c = spec.custom || {};
+    switch (spec.kind) {
+      case 'none': return '';
+      case 'daily': return '毎日';
+      case 'weekly': return '毎週 ' + w;
+      case 'monthlyNth': return '毎月 第' + p.nth + w;
+      case 'monthlyLast': return '毎月 最終' + w;
+      case 'yearly': return '毎年 ' + p.m + '月' + p.d + '日';
+      case 'weekdays': return '毎週平日(月〜金)';
+    }
+    var n = Math.floor(Number(c.interval)) || 1, s;
+    var every = { DAILY: ['毎日', n + '日ごと'], WEEKLY: ['毎週', n + '週間ごと'], MONTHLY: ['毎月', n + 'か月ごと'], YEARLY: ['毎年', n + '年ごと'] }[c.unit];
+    if (!every) return '';
+    s = n === 1 ? every[0] : every[1];
+    if (c.unit === 'WEEKLY') {
+      var ds = cleanDays(c.days);
+      if (ds.length) s += ' ' + ds.map(function (d) { return DOW[d]; }).join('・') + '曜日';
+    } else if (c.unit === 'MONTHLY') {
+      if (c.monthMode === 'nth' && p.nth <= 4) s += ' 第' + p.nth + w;
+      else if (c.monthMode === 'last' && p.isLast) s += ' 最終' + w;
+      else s += ' ' + p.d + '日';
+    } else if (c.unit === 'YEARLY') {
+      s += ' ' + p.m + '月' + p.d + '日';
+    }
+    var e = c.end || {};
+    if (e.type === 'until' && /^\d{4}-\d{2}-\d{2}$/.test(e.until || '')) {
+      var a = e.until.split('-');
+      s += '、' + a[0] + '年' + Number(a[1]) + '月' + Number(a[2]) + '日まで';
+    } else if (e.type === 'count' && Number(e.count) >= 1) {
+      s += '、' + Math.floor(Number(e.count)) + '回';
+    }
+    return s;
+  }
+
+  return { options: options, monthModes: monthModes, build: build, describe: describe, DOW: DOW };
+})();
+</script>
 <script src="config.js"></script>
 <script src="members.js"></script>
 <script>
@@ -218,15 +531,14 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   'use strict';
 
   var CFG = window.APP_CONFIG || {};
-  var MEMBERS = window.APP_MEMBERS || [];
-  var DEFAULT_GROUPS = window.APP_GROUPS || [];
+  var SEED = { members: window.APP_MEMBERS || [], groups: window.APP_GROUPS || [] };   // 初期値(members.js)
+  var MEMBERS = [], GROUPS = [], bookVersion = 0;
   var DEMO = !CFG.GAS_URL || /[?&]demo=1/.test(location.search);
   var LS_KEY = 'schedule-app:v1';
   var WD = ['日', '月', '火', '水', '木', '金', '土'];
   var DEMO_HOLIDAYS = { '2026-11-03': true, '2026-11-23': true };
 
   var byId = {};
-  MEMBERS.forEach(function (m) { byId[m.id] = m; });
 
   var selected = new Set();
   var last = null;      // 直近の検索結果 { slots, payload }
@@ -274,20 +586,81 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   }
 
   /* ---------- 参加者 ---------- */
-  function allGroups() {
-    var custom = loadStore().customGroups || [];
-    return { defaults: DEFAULT_GROUPS, custom: custom };
+  /* ---------- アドレス帳(メンバー・グループ) ---------- */
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function validMember(m) {
+    return m && typeof m.id === 'string' && typeof m.name === 'string' && (m.kind === 'staff' || m.kind === 'room');
+  }
+
+  function setBook(b) {
+    MEMBERS = b.members.map(function (m) { return { id: m.id, name: m.name, kind: m.kind }; });
+    GROUPS = b.groups.map(function (g) { return { name: g.name, ids: g.ids.slice() }; });
+    bookVersion = Number(b.version) || 0;
+    byId = {};
+    MEMBERS.forEach(function (m) { byId[m.id] = m; });
+    Array.from(selected).forEach(function (id) { if (!byId[id]) selected.delete(id); });   // 消えた人は選択から外す
+  }
+
+  function cacheBook() {
+    saveStore({ book: { members: MEMBERS, groups: GROUPS, version: bookVersion } });
+  }
+
+  function loadInitialBook() {
+    var st = loadStore().book;
+    if (st && Array.isArray(st.members) && Array.isArray(st.groups) && st.members.every(validMember) &&
+        st.groups.every(function (g) { return g && typeof g.name === 'string' && Array.isArray(g.ids); })) {
+      setBook(st); return;
+    }
+    // 初回: members.js の初期値。以前この端末で作ったグループがあれば引き継ぐ
+    var groups = SEED.groups.map(function (g) { return { name: g.name, ids: g.ids.slice() }; });
+    (loadStore().customGroups || []).forEach(function (g) {
+      if (g && g.name && Array.isArray(g.ids) && !groups.some(function (x) { return x.name === g.name; })) {
+        groups.push({ name: g.name, ids: g.ids.slice() });
+      }
+    });
+    setBook({ members: SEED.members, groups: groups, version: 0 });
+  }
+
+  function renderAll() { renderGroups(); renderMembers(); renderSelSummary(); }
+
+  // サーバーのアドレス帳を読み込む(接続モードのみ。キー未設定なら何もしない)
+  function refreshBook() {
+    if (DEMO || !getKey()) return Promise.resolve(false);
+    return callApi('getBook', {}).then(function (res) {
+      if (res.ok && res.book) { setBook(res.book); cacheBook(); renderAll(); return true; }
+      if (res.ok) bookVersion = 0;   // サーバーに未保存
+      return false;
+    }).catch(function () { return false; });
+  }
+
+  // 保存(全員で共有)。他の人が先に保存していた場合は、上書きせずにエラーにする
+  function persistBook(b) {
+    var members = b.members.map(function (m) { return { id: m.id.trim().toLowerCase(), name: m.name.trim(), kind: m.kind }; });
+    var have = {}; members.forEach(function (m) { have[m.id] = true; });
+    var groups = b.groups.map(function (g) {
+      var seen = {}, ids = [];
+      g.ids.forEach(function (id) { id = String(id).trim().toLowerCase(); if (have[id] && !seen[id]) { seen[id] = true; ids.push(id); } });
+      return { name: g.name.trim(), ids: ids };
+    });
+    return callApi('saveBook', { members: members, groups: groups, baseVersion: bookVersion }).then(function (res) {
+      if (res.ok) {
+        setBook({ members: members, groups: groups, version: res.version });
+        cacheBook(); renderAll();
+        return res;
+      }
+      if (res.code === 'conflict') {
+        var e = new Error('他の方が先にアドレス帳を更新しました。最新の内容を読み込み直してください');
+        e.conflict = true; throw e;
+      }
+      throw new Error(res.error || 'アドレス帳を保存できませんでした');
+    });
   }
 
   function renderGroups() {
-    var g = allGroups();
     var html = '<button type="button" class="gbtn all" data-act="allstaff">社員すべて</button>';
-    g.defaults.forEach(function (gr, i) {
-      html += '<button type="button" class="gbtn" data-act="def" data-i="' + i + '">' + esc(gr.name) + '</button>';
-    });
-    g.custom.forEach(function (gr, i) {
-      html += '<button type="button" class="gbtn" data-act="cus" data-i="' + i + '">' + esc(gr.name) +
-        '<span class="x" data-act="del" data-i="' + i + '" title="このグループを削除">×</span></button>';
+    GROUPS.forEach(function (gr, i) {
+      html += '<button type="button" class="gbtn" data-act="grp" data-i="' + i + '">' + esc(gr.name) + '</button>';
     });
     $('#groups').innerHTML = html;
   }
@@ -377,13 +750,17 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     return new Promise(function (resolve) {
       setTimeout(function () {
         if (action === 'ping') return resolve({ ok: true });
+        if (action === 'getBook') return resolve({ ok: true, book: null });
+        if (action === 'saveBook') return resolve({ ok: true, version: (Number(p.baseVersion) || 0) + 1 });
         if (action === 'create') {
-          var sMs = Date.parse(p.start), eMs = Date.parse(p.end), day = p.start.slice(0, 10), ign = {};
-          (p.ignoreBusy || []).forEach(function (id) { ign[id] = true; });
-          var conf = p.attendees.filter(function (id) {
-            return !ign[id] && demoBusy(id, day, day).some(function (b) { return b.start < eMs && b.end > sMs; });
-          });
-          if (conf.length && !p.force) return resolve({ ok: false, code: 'conflict', conflicts: conf });
+          if (!p.allDay) {
+            var sMs = Date.parse(p.start), eMs = Date.parse(p.end), day = p.start.slice(0, 10), ign = {};
+            (p.ignoreBusy || []).forEach(function (id) { ign[id] = true; });
+            var conf = p.attendees.filter(function (id) {
+              return !ign[id] && demoBusy(id, day, day).some(function (b) { return b.start < eMs && b.end > sMs; });
+            });
+            if (conf.length && !p.force) return resolve({ ok: false, code: 'conflict', conflicts: conf });
+          }
           return resolve({ ok: true, demo: true, link: '', meet: '' });
         }
         var holidays = p.excludeHolidays === false ? {} : DEMO_HOLIDAYS;
@@ -516,15 +893,109 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   }
 
   /* ---------- 予定の作成 ---------- */
+  var daysTouched = false;
+
+  function baseDate() {
+    if (!current) return '';
+    return current.direct ? $('#dDate').value : current.date;
+  }
+  function isAllDay() { return !!(current && current.direct && $('#dAllDay').checked); }
+
+  function setDays(list) {
+    document.querySelectorAll('#rDays .dbtn').forEach(function (b) {
+      b.classList.toggle('on', list.indexOf(Number(b.getAttribute('data-d'))) >= 0);
+    });
+  }
+  function getDays() {
+    return Array.prototype.map.call(document.querySelectorAll('#rDays .dbtn.on'), function (b) {
+      return Number(b.getAttribute('data-d'));
+    });
+  }
+
+  function fillRemind() {
+    var sel = $('#cRemind'), prev = sel.value || 'default';
+    var opts = isAllDay()
+      ? [['default', 'カレンダーの既定の通知'], ['none', '通知なし'], ['900', '前日の9:00'], ['360', '前日の18:00']]
+      : [['default', 'カレンダーの既定の通知'], ['none', '通知なし'], ['10', '10分前'], ['30', '30分前'], ['60', '1時間前'], ['1440', '1日前']];
+    sel.innerHTML = opts.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('');
+    sel.value = opts.some(function (o) { return o[0] === prev; }) ? prev : 'default';
+  }
+
+  function readSpec() {
+    var endRadio = document.querySelector('input[name="rEnd"]:checked');
+    return {
+      kind: $('#rKind').value,
+      custom: {
+        interval: $('#rInterval').value, unit: $('#rUnit').value, days: getDays(),
+        monthMode: $('#rMonthMode').value,
+        end: { type: endRadio ? endRadio.value : 'never', until: $('#rUntil').value, count: $('#rCount').value }
+      }
+    };
+  }
+
+  // 日付が変わったときに、繰り返しの選択肢(第N曜日など)を作り直す
+  function refreshRecur(forceKey) {
+    var d = baseDate(), sel = $('#rKind'), prev = forceKey || sel.value || 'none';
+    if (!d) {
+      sel.innerHTML = '<option value="none">繰り返さない</option>';
+      $('#rMonthMode').innerHTML = '';
+      updateRecurUi(); return;
+    }
+    var opts = Recur.options(d);
+    sel.innerHTML = opts.map(function (o) { return '<option value="' + o.key + '">' + esc(o.label) + '</option>'; }).join('');
+    sel.value = opts.some(function (o) { return o.key === prev; }) ? prev : 'none';
+    var mm = $('#rMonthMode'), pm = mm.value || 'day', modes = Recur.monthModes(d);
+    mm.innerHTML = modes.map(function (o) { return '<option value="' + o.key + '">' + esc(o.label) + '</option>'; }).join('');
+    mm.value = modes.some(function (o) { return o.key === pm; }) ? pm : 'day';
+    if (!daysTouched) setDays([jstParts_(jstToMs_(d, 0, 0)).dow]);
+    updateRecurUi();
+  }
+
+  function updateRecurUi() {
+    $('#rCustom').style.display = $('#rKind').value === 'custom' ? '' : 'none';
+    var unit = $('#rUnit').value;
+    $('#rDaysRow').style.display = unit === 'WEEKLY' ? '' : 'none';
+    $('#rMonthRow').style.display = unit === 'MONTHLY' ? '' : 'none';
+    var box = $('#rSummary'), d = baseDate();
+    if (!d || $('#rKind').value === 'none') { box.innerHTML = ''; return; }
+    var spec = readSpec(), b = Recur.build(spec, d, isAllDay());
+    if (b.error) { box.innerHTML = '<span class="err">' + esc(b.error) + '</span>'; return; }
+    var txt = Recur.describe(spec, d);
+    if (b.firstDate !== d) txt += ' / 初回は ' + fmtDay(b.firstDate).text;
+    box.innerHTML = '<b>' + esc(txt) + '</b>';
+  }
+
+  function resetRecurUi() {
+    daysTouched = false;
+    $('#rInterval').value = '1';
+    $('#rUnit').value = 'WEEKLY';
+    $('#rUntil').value = '';
+    $('#rCount').value = '13';
+    document.querySelector('input[name="rEnd"][value="never"]').checked = true;
+    $('#rKind').innerHTML = '';
+    $('#rMonthMode').innerHTML = '';
+    refreshRecur('none');
+  }
+
+  function syncAllDayUi() {
+    var ad = $('#dAllDay').checked;
+    $('#dEndDateWrap').style.display = ad ? '' : 'none';
+    $('#dTimeRow').style.display = ad ? 'none' : '';
+  }
+
   function openDirect() {
     if (!selected.size) { toast('先に参加者を選んでください。'); return; }
     current = { direct: true, busy: [] };
-    $('#cHd').textContent = '日時を指定して予定を作成';
+    $('#cHd').textContent = '予定を作成';
     $('#cWhen').style.display = 'none';
     $('#cDirect').style.display = '';
-    $('#dDate').value = $('#startDate').value || jstDateStr_(Date.now() + DAY_MS);
+    var d = $('#startDate').value || jstDateStr_(Date.now() + DAY_MS);
+    $('#dDate').value = d;
+    $('#dEndDate').value = d;
     $('#dStart').value = '10:00';
     $('#dEnd').value = '11:00';
+    $('#dAllDay').checked = false;
+    syncAllDayUi();
     openCreateCommon();
   }
 
@@ -547,6 +1018,13 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     $('#cMeet').checked = false;
     $('#cSkipBusy').checked = false;
     $('#cSkipWrap').style.display = s.busy.length ? '' : 'none';
+    $('#cVis').value = 'default';
+    $('#cAvail').value = 'opaque';
+    $('#gModify').checked = false; $('#gInvite').checked = true; $('#gSee').checked = true;
+    document.querySelector('details.perm').open = false;
+    $('#cRemind').innerHTML = '';
+    fillRemind();
+    resetRecurUi();
     $('#cErr').textContent = '';
     renderPeople();
     var ok = $('#cOk'); ok.disabled = false; ok.textContent = '予定を作成して招待を送る';
@@ -574,25 +1052,50 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   function submitCreate(force) {
     var title = $('#cTitle').value.trim();
     if (!title) { $('#cErr').textContent = 'タイトルを入力してください'; return; }
+
+    var d = baseDate(), allDay = isAllDay();
+    if (!d) { $('#cErr').textContent = '日付を入力してください'; return; }
+    var rb = Recur.build(readSpec(), d, allDay);
+    if (rb.error) { $('#cErr').textContent = rb.error; return; }
+
+    var when = {};
     if (current.direct) {
-      var d = $('#dDate').value, ds = $('#dStart').value, de = $('#dEnd').value;
-      if (!d || !ds || !de) { $('#cErr').textContent = '日付と開始・終了の時刻を入力してください'; return; }
-      if (de <= ds) { $('#cErr').textContent = '終了時刻は開始時刻より後にしてください'; return; }
-      current.start = d + 'T' + ds + ':00+09:00';
-      current.end = d + 'T' + de + ':00+09:00';
+      var shift = (jstToMs_(rb.firstDate, 0, 0) - jstToMs_(d, 0, 0)) / DAY_MS;  // 曜日が合わない場合の初回日のずれ
+      if (allDay) {
+        var ed = $('#dEndDate').value || d;
+        if (ed < d) { $('#cErr').textContent = '終了日は開始日以降にしてください'; return; }
+        when = { allDay: true, startDate: rb.firstDate, endDate: jstDateStr_(jstToMs_(ed, 0, 0) + shift * DAY_MS) };
+      } else {
+        var ds = $('#dStart').value, de = $('#dEnd').value;
+        if (!ds || !de) { $('#cErr').textContent = '開始・終了の時刻を入力してください'; return; }
+        if (de <= ds) { $('#cErr').textContent = '終了時刻は開始時刻より後にしてください'; return; }
+        when = { start: rb.firstDate + 'T' + ds + ':00+09:00', end: rb.firstDate + 'T' + de + ':00+09:00' };
+      }
+    } else {
+      if (rb.firstDate !== d) {
+        $('#cErr').textContent = '選んだ日は、繰り返す曜日に含まれていません。選んだ日の曜日を含めてください';
+        return;
+      }
+      when = { start: current.start, end: current.end };
     }
+
     var ok = $('#cOk');
     ok.disabled = true; ok.textContent = '作成しています…';
     $('#cErr').textContent = '';
-    callApi('create', {
-      title: title, start: current.start, end: current.end,
-      attendees: attendeeIds(), location: $('#cLoc').value.trim(), description: $('#cDesc').value.trim(),
-      meet: $('#cMeet').checked, force: !!force, ignoreBusy: current.busy
-    }).then(function (res) {
+    var payload = {
+      title: title, attendees: attendeeIds(), location: $('#cLoc').value.trim(), description: $('#cDesc').value.trim(),
+      meet: $('#cMeet').checked, force: !!force, ignoreBusy: current.busy,
+      recurrence: rb.rrule, reminder: $('#cRemind').value, visibility: $('#cVis').value, transparency: $('#cAvail').value,
+      guestsCanModify: $('#gModify').checked, guestsCanInviteOthers: $('#gInvite').checked, guestsCanSeeOtherGuests: $('#gSee').checked
+    };
+    Object.keys(when).forEach(function (k) { payload[k] = when[k]; });
+    var recurText = rb.rrule.length ? Recur.describe(readSpec(), d) : '';
+
+    callApi('create', payload).then(function (res) {
       if (res.ok) {
         $('#createDlg').close();
         if (res.demo) toast('デモ表示のため、実際の予定は作成していません。');
-        else toast('予定を作成し、招待を送りました。' +
+        else toast('予定を作成し、招待を送りました。' + (recurText ? '(' + esc(recurText) + ')' : '') +
           (res.link ? ' <a href="' + esc(res.link) + '" target="_blank" rel="noopener">Googleカレンダーで開く</a>' : '') +
           (res.meet ? ' ／ <a href="' + esc(res.meet) + '" target="_blank" rel="noopener">Meet</a>' : ''), true);
         return;
@@ -610,6 +1113,317 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     }).catch(function (e) {
       $('#cErr').textContent = e.message;
       ok.disabled = false; ok.textContent = '予定を作成して招待を送る';
+    });
+  }
+
+  /* ---------- アドレス帳の編集画面 ---------- */
+  var draft = null, activeG = 0, keySeq = 0;
+
+  function newK() { keySeq += 1; return 'k' + keySeq; }
+
+  function draftFrom(members, groups) {
+    var kOf = {};
+    var d = { members: members.map(function (m) { var k = newK(); kOf[m.id] = k; return { k: k, id: m.id, name: m.name, kind: m.kind }; }) };
+    d.groups = groups.map(function (g) {
+      return { name: g.name, ks: g.ids.filter(function (id) { return kOf[id]; }).map(function (id) { return kOf[id]; }) };
+    });
+    return d;
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('#bookDlg .tab').forEach(function (t) { t.classList.toggle('on', t.getAttribute('data-tab') === name); });
+    $('#paneMembers').style.display = name === 'members' ? '' : 'none';
+    $('#paneGroups').style.display = name === 'groups' ? '' : 'none';
+    if (name === 'groups') renderBookGroups();
+  }
+
+  function openBook() {
+    refreshBook().then(function () {
+      draft = draftFrom(MEMBERS, GROUPS);
+      activeG = 0;
+      $('#bmQ').value = ''; $('#bgQ').value = ''; $('#bmPasteText').value = '';
+      $('#bmPasteBox').style.display = 'none';
+      $('#bmMsg').textContent = ''; $('#bkErr').textContent = '';
+      switchTab('members'); renderBookMembers();
+      var ok = $('#bkSave'); ok.disabled = false; ok.textContent = '保存';
+      $('#bookDlg').showModal();
+    });
+  }
+
+  function memberLabel(m) { return m.name.trim() || m.id.trim() || '(未入力)'; }
+  function isBlank(m) { return !m.id.trim() && !m.name.trim(); }
+
+  // 入力チェック(保存時と、入力のたびの色付けで共用)
+  function validateDraft() {
+    var res = { members: {}, groups: {}, first: '' };
+    var ctrl = /[\u0000-\u001f\u007f]/, seen = {};
+    draft.members.forEach(function (m, i) {
+      if (isBlank(m)) return;
+      var id = m.id.trim().toLowerCase(), name = m.name.trim(), e = null;
+      if (!name) e = { f: 'name', msg: '名前を入力してください' };
+      else if (name.length > 40 || ctrl.test(name)) e = { f: 'name', msg: '名前は40文字以内で入力してください' };
+      else if (!EMAIL_RE.test(id) || id.length > 100) e = { f: 'id', msg: 'メールアドレスの形式が正しくありません' };
+      else if (seen[id]) e = { f: 'id', msg: 'メールアドレスが重複しています' };
+      if (!e) seen[id] = true;
+      else { res.members[m.k] = e; if (!res.first) res.first = 'メンバー' + (i + 1) + '行目: ' + e.msg; }
+    });
+    var names = {};
+    draft.groups.forEach(function (g, i) {
+      var n = g.name.trim(), msg = '';
+      if (!n) msg = 'グループ名を入力してください';
+      else if (n.length > 30 || ctrl.test(n)) msg = 'グループ名は30文字以内で入力してください';
+      else if (names[n]) msg = '同じ名前のグループがあります';
+      names[n] = true;
+      if (msg) { res.groups[i] = msg; if (!res.first) res.first = 'グループ' + (i + 1) + ': ' + msg; }
+    });
+    return res;
+  }
+
+  function markInvalid() {
+    var v = validateDraft();
+    document.querySelectorAll('#bmList .brow[data-k]').forEach(function (row) {
+      var e = v.members[row.getAttribute('data-k')];
+      ['name', 'id'].forEach(function (f) {
+        var el = row.querySelector('[data-f="' + f + '"]');
+        var bad = !!(e && e.f === f);
+        el.classList.toggle('bad', bad);
+        if (bad) el.title = e.msg; else el.removeAttribute('title');
+      });
+    });
+    document.querySelectorAll('#bgList .gitem').forEach(function (el) {
+      el.classList.toggle('bad', !!v.groups[el.getAttribute('data-gi')]);
+    });
+    var gn = $('#bgName'), ge = v.groups[activeG];
+    gn.classList.toggle('bad', !!ge);
+    if (ge) gn.title = ge; else gn.removeAttribute('title');
+    if (!v.first) $('#bkErr').textContent = '';   // 直したら、前回のエラー文を消す
+    return v;
+  }
+
+  function renderBookMembers() {
+    var q = $('#bmQ').value.trim().toLowerCase();
+    var html = '<div class="brow head"><span>名前</span><span>メールアドレス</span><span>種類</span><span></span></div>', n = 0;
+    draft.members.forEach(function (m) {
+      if (q && m.name.toLowerCase().indexOf(q) < 0 && m.id.toLowerCase().indexOf(q) < 0) return;
+      n++;
+      html += '<div class="brow" data-k="' + m.k + '">' +
+        '<input class="bn" data-f="name" value="' + esc(m.name) + '" placeholder="名前" maxlength="40">' +
+        '<input class="be" data-f="id" value="' + esc(m.id) + '" placeholder="chibo.xxx@gmail.com" inputmode="email" autocomplete="off">' +
+        '<select class="bk" data-f="kind"><option value="staff"' + (m.kind === 'staff' ? ' selected' : '') + '>社員</option>' +
+        '<option value="room"' + (m.kind === 'room' ? ' selected' : '') + '>会議室・設備</option></select>' +
+        '<button type="button" class="xbtn" data-del="' + m.k + '" title="このメンバーを削除">×</button></div>';
+    });
+    if (!n) html += '<div class="empty small">該当するメンバーがいません</div>';
+    $('#bmList').innerHTML = html;
+    var staff = draft.members.filter(function (m) { return m.kind === 'staff' && !isBlank(m); }).length;
+    var rooms = draft.members.filter(function (m) { return m.kind === 'room' && !isBlank(m); }).length;
+    $('#bmCount').textContent = '全' + (staff + rooms) + '件(社員 ' + staff + '・会議室/設備 ' + rooms + ')。「保存」を押すまで反映されません。';
+    markInvalid();
+  }
+
+  function groupCount(g) {
+    var ok = {}; draft.members.forEach(function (m) { if (!isBlank(m)) ok[m.k] = true; });
+    return g.ks.filter(function (k) { return ok[k]; }).length;
+  }
+
+  function renderBookGroups() {
+    var has = draft.groups.length > 0;
+    $('#bgEdit').style.display = has ? '' : 'none';
+    $('#bgEmpty').style.display = has ? 'none' : '';
+    if (activeG >= draft.groups.length) activeG = Math.max(0, draft.groups.length - 1);
+    var html = '';
+    draft.groups.forEach(function (g, i) {
+      html += '<div class="gitem' + (i === activeG ? ' on' : '') + '" data-gi="' + i + '"><span class="gn">' + esc(g.name.trim() || '(名前なし)') +
+        '</span><span class="gc">' + groupCount(g) + '名</span>' +
+        '<button type="button" class="mv" data-mv="-1" data-gi="' + i + '" title="上へ">▲</button>' +
+        '<button type="button" class="mv" data-mv="1" data-gi="' + i + '" title="下へ">▼</button></div>';
+    });
+    $('#bgList').innerHTML = html || '';
+    if (has) { $('#bgName').value = draft.groups[activeG].name; renderGroupMembers(); }
+    markInvalid();
+  }
+
+  function renderGroupMembers() {
+    var g = draft.groups[activeG]; if (!g) return;
+    var q = $('#bgQ').value.trim().toLowerCase(), html = '';
+    [['staff', '社員'], ['room', '会議室・設備']].forEach(function (kd) {
+      var list = draft.members.filter(function (m) {
+        return !isBlank(m) && m.kind === kd[0] && (!q || m.name.toLowerCase().indexOf(q) >= 0 || m.id.toLowerCase().indexOf(q) >= 0);
+      });
+      if (!list.length) return;
+      html += '<div class="sec">' + kd[1] + '<span>' + list.length + '</span></div>';
+      list.forEach(function (m) {
+        html += '<label class="mem"><input type="checkbox" data-k="' + m.k + '"' + (g.ks.indexOf(m.k) >= 0 ? ' checked' : '') +
+          '><span class="nm">' + esc(memberLabel(m)) + '</span><span class="em">' + esc(m.id.replace('@gmail.com', '')) + '</span></label>';
+      });
+    });
+    $('#bgMembers').innerHTML = html || '<div class="empty small">該当するメンバーがいません</div>';
+    $('#bgCount').innerHTML = '<b>' + groupCount(g) + '名</b>を選択中';
+  }
+
+  function refreshGroupItem() {
+    var el = document.querySelector('#bgList .gitem[data-gi="' + activeG + '"]');
+    if (!el) return;
+    el.querySelector('.gn').textContent = draft.groups[activeG].name.trim() || '(名前なし)';
+    el.querySelector('.gc').textContent = groupCount(draft.groups[activeG]) + '名';
+  }
+
+  function addMemberRow() {
+    $('#bmQ').value = '';
+    draft.members.unshift({ k: newK(), id: '', name: '', kind: 'staff' });
+    renderBookMembers();
+    var first = document.querySelector('#bmList .brow[data-k] .bn'); if (first) first.focus();
+    $('#bmList').scrollTop = 0;
+  }
+
+  // 貼り付けテキスト → {rows:[{id,name}], skipped:n}
+  function parsePaste(text) {
+    var rows = [], skipped = 0;
+    text.split(/\r?\n/).forEach(function (line) {
+      if (!line.trim()) return;
+      var m = line.match(/[^\s@,;"'<>、，\t]+@[^\s@,;"'<>、，\t]+\.[^\s@,;"'<>、，\t]+/);
+      if (!m) { skipped++; return; }
+      var name = line.replace(m[0], '').replace(/[\t,;"'<>、，]+/g, ' ').trim();
+      rows.push({ id: m[0].toLowerCase(), name: name || m[0].split('@')[0] });
+    });
+    return { rows: rows, skipped: skipped };
+  }
+
+  function pasteGo() {
+    var r = parsePaste($('#bmPasteText').value), kind = $('#bmPasteKind').value;
+    var have = {}; draft.members.forEach(function (m) { have[m.id.trim().toLowerCase()] = true; });
+    var add = [], dup = 0;
+    r.rows.forEach(function (x) {
+      if (have[x.id]) { dup++; return; }
+      have[x.id] = true; add.push({ k: newK(), id: x.id, name: x.name, kind: kind });
+    });
+    draft.members = add.concat(draft.members);
+    $('#bmPasteText').value = ''; $('#bmPasteBox').style.display = 'none'; $('#bmQ').value = '';
+    var msg = add.length + '件を追加しました。' + (dup ? ' 登録済みのため' + dup + '件を除きました。' : '') +
+      (r.skipped ? ' メールアドレスが読み取れない' + r.skipped + '行(見出し行など)は読み飛ばしました。' : '');
+    var box = $('#bmMsg'); box.textContent = msg; box.classList.toggle('warn', !add.length);
+    renderBookMembers();
+  }
+
+  function saveBookClick() {
+    var v = markInvalid();
+    if (v.first) { $('#bkErr').textContent = v.first; return; }
+    var members = draft.members.filter(function (m) { return !isBlank(m); });
+    var idOf = {}; members.forEach(function (m) { idOf[m.k] = m.id.trim().toLowerCase(); });
+    var groups = draft.groups.map(function (g) {
+      return { name: g.name, ids: g.ks.filter(function (k) { return idOf[k]; }).map(function (k) { return idOf[k]; }) };
+    });
+    var ok = $('#bkSave'); ok.disabled = true; ok.textContent = '保存しています…';
+    $('#bkErr').textContent = '';
+    persistBook({ members: members, groups: groups }).then(function () {
+      $('#bookDlg').close();
+      toast('アドレス帳を保存しました。' + (DEMO ? '(デモ表示のため、この端末内だけに保存しています)' : '(全員に反映されます)'));
+    }).catch(function (e) {
+      ok.disabled = false; ok.textContent = '保存';
+      if (e.conflict) {
+        if (window.confirm('他の方が先にアドレス帳を更新しています。\n最新の内容を読み込み直しますか?(いま編集中の内容は破棄されます)')) {
+          refreshBook().then(function () {
+            $('#bookDlg').close(); toast('最新のアドレス帳を読み込みました。もう一度、編集してください。');
+          });
+        } else $('#bkErr').textContent = e.message;
+        return;
+      }
+      $('#bkErr').textContent = e.message;
+    });
+  }
+
+  function bindBook() {
+    $('#bookBtn').addEventListener('click', openBook);
+    $('#bookDlg').addEventListener('click', function (e) {
+      var t = e.target.closest('.tab'); if (t) switchTab(t.getAttribute('data-tab'));
+    });
+    $('#bkCancel').addEventListener('click', function () { $('#bookDlg').close(); });
+    $('#bkSave').addEventListener('click', saveBookClick);
+    $('#bkReset').addEventListener('click', function () {
+      if (!window.confirm('アドレス帳を初期値(members.js の内容)に戻します。\n「保存」を押すまで確定しません。よろしいですか?')) return;
+      draft = draftFrom(SEED.members, SEED.groups); activeG = 0;
+      renderBookMembers(); renderBookGroups(); $('#bkErr').textContent = '';
+    });
+
+    // メンバー
+    $('#bmQ').addEventListener('input', renderBookMembers);
+    $('#bmAdd').addEventListener('click', addMemberRow);
+    $('#bmPaste').addEventListener('click', function () {
+      var b = $('#bmPasteBox'); b.style.display = b.style.display === 'none' ? '' : 'none';
+      if (b.style.display !== 'none') $('#bmPasteText').focus();
+    });
+    $('#bmPasteCancel').addEventListener('click', function () { $('#bmPasteBox').style.display = 'none'; });
+    $('#bmPasteGo').addEventListener('click', pasteGo);
+    $('#bmList').addEventListener('input', function (e) {
+      var row = e.target.closest('.brow[data-k]'), f = e.target.getAttribute('data-f');
+      if (!row || !f) return;
+      var m = draft.members.filter(function (x) { return x.k === row.getAttribute('data-k'); })[0];
+      if (!m) return;
+      m[f] = e.target.value;
+      markInvalid();
+    });
+    $('#bmList').addEventListener('change', function (e) {   // 種類(select)の変更
+      if (e.target.getAttribute('data-f') === 'kind') {
+        var row = e.target.closest('.brow[data-k]');
+        draft.members.forEach(function (x) { if (x.k === row.getAttribute('data-k')) x.kind = e.target.value; });
+        renderBookMembers();
+      }
+    });
+    $('#bmList').addEventListener('click', function (e) {
+      var d = e.target.closest('[data-del]'); if (!d) return;
+      var k = d.getAttribute('data-del');
+      draft.members = draft.members.filter(function (m) { return m.k !== k; });
+      draft.groups.forEach(function (g) { g.ks = g.ks.filter(function (x) { return x !== k; }); });
+      renderBookMembers();
+    });
+
+    // グループ
+    $('#bgList').addEventListener('click', function (e) {
+      var mv = e.target.closest('[data-mv]');
+      if (mv) {
+        e.stopPropagation();
+        var i = Number(mv.getAttribute('data-gi')), j = i + Number(mv.getAttribute('data-mv'));
+        if (j < 0 || j >= draft.groups.length) return;
+        var tmp = draft.groups[i]; draft.groups[i] = draft.groups[j]; draft.groups[j] = tmp;
+        if (activeG === i) activeG = j; else if (activeG === j) activeG = i;
+        renderBookGroups(); return;
+      }
+      var it = e.target.closest('.gitem'); if (!it) return;
+      activeG = Number(it.getAttribute('data-gi')); renderBookGroups();
+    });
+    $('#bgAdd').addEventListener('click', function () {
+      var used = {}; draft.groups.forEach(function (g) { used[g.name.trim()] = true; });
+      var n = draft.groups.length + 1, name = 'グループ' + n;
+      while (used[name]) { n++; name = 'グループ' + n; }
+      draft.groups.push({ name: name, ks: [] }); activeG = draft.groups.length - 1;
+      switchTab('groups');
+      var inp = $('#bgName'); inp.focus(); inp.select();
+    });
+    $('#bgName').addEventListener('input', function () {
+      draft.groups[activeG].name = this.value; refreshGroupItem(); markInvalid();
+    });
+    $('#bgQ').addEventListener('input', renderGroupMembers);
+    $('#bgMembers').addEventListener('change', function (e) {
+      var k = e.target.getAttribute('data-k'), g = draft.groups[activeG];
+      if (!k || !g) return;
+      var at = g.ks.indexOf(k);
+      if (e.target.checked && at < 0) g.ks.push(k);
+      if (!e.target.checked && at >= 0) g.ks.splice(at, 1);
+      $('#bgCount').innerHTML = '<b>' + groupCount(g) + '名</b>を選択中'; refreshGroupItem();
+    });
+    $('#bgAllStaff').addEventListener('click', function () {
+      var g = draft.groups[activeG]; if (!g) return;
+      draft.members.forEach(function (m) { if (m.kind === 'staff' && !isBlank(m) && g.ks.indexOf(m.k) < 0) g.ks.push(m.k); });
+      renderGroupMembers(); refreshGroupItem();
+    });
+    $('#bgClear').addEventListener('click', function () {
+      var g = draft.groups[activeG]; if (!g) return;
+      g.ks = []; renderGroupMembers(); refreshGroupItem();
+    });
+    $('#bgDel').addEventListener('click', function () {
+      var g = draft.groups[activeG]; if (!g) return;
+      if (!window.confirm('グループ「' + (g.name.trim() || '名前なし') + '」を削除しますか?')) return;
+      draft.groups.splice(activeG, 1); renderBookGroups();
     });
   }
 
@@ -636,16 +1450,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       var act = t.getAttribute('data-act'), i = Number(t.getAttribute('data-i'));
       if (act === 'allstaff') {
         addIds(MEMBERS.filter(function (m) { return m.kind === 'staff'; }).map(function (m) { return m.id; }));
-      } else if (act === 'def') {
-        addIds(DEFAULT_GROUPS[i].ids);
-      } else if (act === 'cus') {
-        addIds(allGroups().custom[i].ids);
-      } else if (act === 'del') {
-        e.stopPropagation();
-        var cs = allGroups().custom;
-        if (window.confirm('グループ「' + cs[i].name + '」を削除しますか?')) {
-          cs.splice(i, 1); saveStore({ customGroups: cs }); renderGroups();
-        }
+      } else if (act === 'grp' && GROUPS[i]) {
+        addIds(GROUPS[i].ids);
       }
     });
     $('#q').addEventListener('input', renderMembers);
@@ -660,15 +1466,40 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     });
     $('#saveGroup').addEventListener('click', function () {
       if (!selected.size) { toast('先に参加者を選んでください。'); return; }
-      var name = window.prompt('グループ名を入力してください(選択中の' + selected.size + '名を保存します)');
+      var name = window.prompt('グループ名を入力してください(選択中の' + selected.size + '名を、全員が使えるグループとして保存します)');
       if (!name || !name.trim()) return;
-      var cs = allGroups().custom;
-      cs.push({ name: name.trim(), ids: Array.from(selected) });
-      saveStore({ customGroups: cs });
-      renderGroups();
+      name = name.trim();
+      if (name.length > 30) { toast('グループ名は30文字以内にしてください。'); return; }
+      var groups = GROUPS.map(function (g) { return { name: g.name, ids: g.ids.slice() }; });
+      var at = -1; groups.forEach(function (g, i) { if (g.name === name) at = i; });
+      if (at >= 0) {
+        if (!window.confirm('同じ名前のグループがあります。選択中の参加者で置き換えますか?')) return;
+        groups[at].ids = Array.from(selected);
+      } else groups.push({ name: name, ids: Array.from(selected) });
+      persistBook({ members: MEMBERS, groups: groups }).then(function () {
+        toast('グループ「' + name + '」を保存しました。');
+      }).catch(function (e) {
+        if (e.conflict) refreshBook().then(function () { toast('他の方が先にアドレス帳を更新したため、最新を読み込みました。もう一度お試しください。'); });
+        else toast(e.message);
+      });
     });
     $('#searchBtn').addEventListener('click', doSearch);
     $('#directBtn').addEventListener('click', openDirect);
+    $('#rDays').innerHTML = Recur.DOW.map(function (n, i) {
+      return '<button type="button" class="dbtn" data-d="' + i + '">' + n + '</button>';
+    }).join('');
+    $('#rDays').addEventListener('click', function (e) {
+      var b = e.target.closest('.dbtn');
+      if (!b) return;
+      b.classList.toggle('on'); daysTouched = true; updateRecurUi();
+    });
+    $('#createDlg').addEventListener('input', updateRecurUi);
+    $('#createDlg').addEventListener('change', updateRecurUi);
+    $('#dDate').addEventListener('change', function () {
+      if ($('#dEndDate').value < this.value) $('#dEndDate').value = this.value;
+      refreshRecur();
+    });
+    $('#dAllDay').addEventListener('change', function () { syncAllDayUi(); fillRemind(); updateRecurUi(); });
     $('#results').addEventListener('click', function (e) {
       var b = e.target.closest('.chip');
       if (b) openCreate(Number(b.getAttribute('data-i')));
@@ -681,7 +1512,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     $('#keyClose').addEventListener('click', function () { $('#keyDlg').close(); });
     $('#keySave').addEventListener('click', function () {
       saveStore({ accessKey: $('#keyInput').value.trim() });
-      $('#keyDlg').close(); toast('アクセスキーを保存しました。');
+      $('#keyDlg').close(); toast('アクセスキーを保存しました。'); refreshBook();
     });
     $('#keyTest').addEventListener('click', function () {
       saveStore({ accessKey: $('#keyInput').value.trim() });
@@ -694,10 +1525,12 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
   /* ---------- 起動 ---------- */
   initForm();
+  loadInitialBook();
   var saved = loadStore().lastSelected;
   if (saved && saved.length) saved.forEach(function (id) { if (byId[id]) selected.add(id); });
-  else if (DEFAULT_GROUPS[0]) DEFAULT_GROUPS[0].ids.forEach(function (id) { if (byId[id]) selected.add(id); });
-  renderGroups(); renderMembers(); renderSelSummary(); bind();
+  else if (GROUPS[0]) GROUPS[0].ids.forEach(function (id) { if (byId[id]) selected.add(id); });
+  renderGroups(); renderMembers(); renderSelSummary(); bind(); bindBook();
+  refreshBook();
   showResultsMessage('条件を決めて「空き時間を探す」を押してください',
     DEMO ? 'いまはデモ表示です(サンプルの予定で動作を確認できます)。' : '選んだ参加者全員が空いている日時を一覧にします。');
 })();
