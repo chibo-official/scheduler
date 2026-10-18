@@ -2,8 +2,17 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>日程調整</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#942343">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="日程調整">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <style>
 :root{
   --red:#942343;--red-d:#7a1c37;--red-l:#f7eaee;
@@ -13,14 +22,14 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Meiryo",sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.55}
 button,input,select,textarea{font:inherit;color:inherit}
-.topbar{background:var(--red);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.topbar{background:var(--red);color:#fff;padding:calc(12px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 12px calc(20px + env(safe-area-inset-left));display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .topbar h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.04em}
 .topbar .sub{font-size:12px;opacity:.85}
 .topbar .spacer{flex:1}
 .badge{font-size:11px;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.2)}
 .btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:6px;padding:5px 11px;cursor:pointer;font-size:12px}
 .btn-ghost:hover{background:rgba(255,255,255,.12)}
-.layout{display:grid;grid-template-columns:390px 1fr;gap:16px;max-width:1260px;margin:16px auto;padding:0 16px;align-items:start}
+.layout{display:grid;grid-template-columns:390px 1fr;gap:16px;max-width:1260px;margin:16px auto;padding:0 16px calc(16px + env(safe-area-inset-bottom));align-items:start}
 .layout>div{min-width:0}
 @media(max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
@@ -155,7 +164,7 @@ dialog.dlg.wide{width:min(780px,96vw)}
   .brow{grid-template-columns:minmax(0,1fr) 30px;grid-template-areas:"n x" "e x" "k x"}
   .brow.head{display:none}
 }
-#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#232326;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;display:none;max-width:92vw;z-index:50;box-shadow:0 6px 24px rgba(0,0,0,.3)}
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#232326;color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;display:none;max-width:92vw;z-index:50;box-shadow:0 6px 24px rgba(0,0,0,.3)}
 #toast a{color:#ffd1dd}
 </style>
 </head>
@@ -1533,6 +1542,11 @@ window.Recur = (function () {
   refreshBook();
   showResultsMessage('条件を決めて「空き時間を探す」を押してください',
     DEMO ? 'いまはデモ表示です(サンプルの予定で動作を確認できます)。' : '選んだ参加者全員が空いている日時を一覧にします。');
+
+  // ホーム画面に追加できるようにするための登録(https または localhost のときだけ。失敗しても画面の動作には影響しません)
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(function () { /* 登録できなくても通常どおり使えます */ });
+  }
 })();
 </script>
 </body>
