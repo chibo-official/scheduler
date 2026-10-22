@@ -60,21 +60,5 @@ window.APP_MEMBERS = [
   { id: 'chibo.guest@gmail.com', name: '応接室', kind: 'room' }
 ];
 
-/* ワンクリックで選択できるグループ(ids はメールアドレス) */
-window.APP_GROUPS = [
-  {
-    name: '営業推進本部',
-    ids: [
-      'chibo.koyama@gmail.com', 'chibo.kawata@gmail.com', 'chibo.naito@gmail.com',
-      'chibo.tomiyama@gmail.com', 'chibo.tsuzaki@gmail.com', 'chibo.asahara@gmail.com',
-      'chibo.itou@gmail.com', 'chibo.sakuragi@gmail.com'
-    ]
-  },
-  {
-    name: '役員・本部長',
-    ids: [
-      'chibo.nakai@gmail.com', 'chibo.aizawa@gmail.com',
-      'chibo.kunai@gmail.com', 'chibo.narita@gmail.com'
-    ]
-  }
-];
+/* グループは共通の名簿には含めません(各自が画面の「アドレス帳を編集」で、自分専用に作ります) */
+window.APP_GROUPS = [];

@@ -216,6 +216,7 @@ dialog.dlg.wide{width:min(780px,96vw)}
           <label><input type="checkbox" id="skipLunch" checked>昼休み(12:00〜13:00)にかかる枠を除く</label>
           <label><input type="checkbox" id="excludeHolidays" checked>祝日を除く</label>
           <label><input type="checkbox" id="includeWeekend">土日も候補に含める</label>
+          <label><input type="checkbox" id="ignoreAllDay">カレンダー上部の「終日の予定」は無視する(時間指定の予定だけで判定。検索に少し時間がかかります)</label>
         </div>
       </div>
       <button class="primary" id="searchBtn" type="button">空き時間を探す</button>
@@ -311,12 +312,13 @@ dialog.dlg.wide{width:min(780px,96vw)}
 </dialog>
 
 <dialog class="dlg wide" id="bookDlg">
-  <div class="hd">アドレス帳の編集</div>
+  <div class="hd" id="bkTitle">アドレス帳の編集</div>
   <div class="tabs">
-    <button type="button" class="tab on" data-tab="members">メンバー</button>
-    <button type="button" class="tab" data-tab="groups">グループ</button>
+    <button type="button" class="tab on" data-tab="members" id="tabMembers">メンバー</button>
+    <button type="button" class="tab" data-tab="groups" id="tabGroups">グループ</button>
   </div>
   <div class="bd">
+    <div class="small" id="bkBanner" style="background:#f4f4f7;border-radius:6px;padding:8px 10px;margin-bottom:10px"></div>
     <div id="paneMembers">
       <div class="btoolbar">
         <input type="search" id="bmQ" placeholder="名前・アドレスで絞り込み">
@@ -363,7 +365,8 @@ dialog.dlg.wide{width:min(780px,96vw)}
     <div class="err" id="bkErr"></div>
   </div>
   <div class="ft">
-    <button class="link" id="bkReset" type="button" style="margin-right:auto">初期値に戻す</button>
+    <button class="link" id="bkMode" type="button" style="margin-right:auto;display:none">共通の名簿を編集する(管理者)</button>
+    <button class="link" id="bkReset" type="button" style="display:none">初期値に戻す</button>
     <button class="secondary" id="bkCancel" type="button">キャンセル</button>
     <button class="primary" id="bkSave" type="button">保存</button>
   </div>
@@ -544,7 +547,10 @@ window.Recur = (function () {
 
   var CFG = window.APP_CONFIG || {};
   var SEED = { members: window.APP_MEMBERS || [], groups: window.APP_GROUPS || [] };   // 初期値(members.js)
-  var MEMBERS = [], GROUPS = [], bookVersion = 0;
+  var MEMBERS = [], GROUPS = [];                                   // 画面で使う一覧(共通 + 各自の追加分)
+  var SHARED = { members: [], version: 0 };                        // 共通の名簿(全員で同じ。メンバーのみ)
+  var PERSONAL = { members: [], groups: [], version: 0 };          // 各自の追加分(このGASだけに保存)
+  var canEditShared = false;                                       // 共通の名簿を変更できる人(管理者)か
   var LS_KEY = 'schedule-app:v1';
   var GAS_URL_RE = /^https:\/\/script\.google\.com\/(a\/[A-Za-z0-9.\-]+\/)?macros\/s\/[A-Za-z0-9_\-]+\/exec$/;
   function readStoredUrl() {
@@ -613,33 +619,50 @@ window.Recur = (function () {
     return m && typeof m.id === 'string' && typeof m.name === 'string' && (m.kind === 'staff' || m.kind === 'room');
   }
 
-  function setBook(b) {
-    MEMBERS = b.members.map(function (m) { return { id: m.id, name: m.name, kind: m.kind }; });
-    GROUPS = b.groups.map(function (g) { return { name: g.name, ids: g.ids.slice() }; });
-    bookVersion = Number(b.version) || 0;
-    byId = {};
-    MEMBERS.forEach(function (m) { byId[m.id] = m; });
+  // 共通の名簿 + 各自の追加分 から、画面で使う一覧を作る(重複は共通が優先。グループは各自の追加分)
+  function setBook(sh, pe) {
+    SHARED = { members: (sh && sh.members || []).map(cleanMember), version: Number(sh && sh.version) || 0 };
+    PERSONAL = {
+      members: (pe && pe.members || []).map(cleanMember),
+      groups: (pe && pe.groups || []).map(function (g) { return { name: g.name, ids: g.ids.slice() }; }),
+      version: Number(pe && pe.version) || 0
+    };
+    rebuild();
+  }
+  function cleanMember(m) { return { id: m.id, name: m.name, kind: m.kind }; }
+
+  function rebuild() {
+    var seen = {}; MEMBERS = [];
+    SHARED.members.concat(PERSONAL.members).forEach(function (m) {
+      if (seen[m.id]) return; seen[m.id] = true; MEMBERS.push({ id: m.id, name: m.name, kind: m.kind });
+    });
+    byId = {}; MEMBERS.forEach(function (m) { byId[m.id] = m; });
+    GROUPS = PERSONAL.groups.map(function (g) { return { name: g.name, ids: g.ids.filter(function (id) { return byId[id]; }) }; });
     Array.from(selected).forEach(function (id) { if (!byId[id]) selected.delete(id); });   // 消えた人は選択から外す
   }
 
   function cacheBook() {
-    saveStore({ book: { members: MEMBERS, groups: GROUPS, version: bookVersion } });
+    saveStore({ book2: { shared: SHARED, personal: PERSONAL, canEditShared: canEditShared } });
   }
 
+  function validLayer(x) { return x && Array.isArray(x.members) && x.members.every(validMember); }
+
   function loadInitialBook() {
-    var st = loadStore().book;
-    if (st && Array.isArray(st.members) && Array.isArray(st.groups) && st.members.every(validMember) &&
-        st.groups.every(function (g) { return g && typeof g.name === 'string' && Array.isArray(g.ids); })) {
-      setBook(st); return;
+    var st = loadStore().book2;
+    if (st && validLayer(st.shared) && validLayer(st.personal) && Array.isArray(st.personal.groups) &&
+        st.personal.groups.every(function (g) { return g && typeof g.name === 'string' && Array.isArray(g.ids); })) {
+      canEditShared = !!st.canEditShared;
+      setBook(st.shared, st.personal); return;
     }
-    // 初回: members.js の初期値。以前この端末で作ったグループがあれば引き継ぐ
-    var groups = SEED.groups.map(function (g) { return { name: g.name, ids: g.ids.slice() }; });
+    // 初回: members.js の初期値(共通の名簿)。以前この端末で作ったグループがあれば、各自のグループとして引き継ぐ
+    var groups = [];
     (loadStore().customGroups || []).forEach(function (g) {
       if (g && g.name && Array.isArray(g.ids) && !groups.some(function (x) { return x.name === g.name; })) {
         groups.push({ name: g.name, ids: g.ids.slice() });
       }
     });
-    setBook({ members: SEED.members, groups: groups, version: 0 });
+    canEditShared = DEMO;
+    setBook({ members: SEED.members, version: 0 }, { members: [], groups: groups, version: 0 });
   }
 
   function renderAll() { renderGroups(); renderMembers(); renderSelSummary(); }
@@ -648,32 +671,55 @@ window.Recur = (function () {
   function refreshBook() {
     if (DEMO || !getKey()) return Promise.resolve(false);
     return callApi('getBook', {}).then(function (res) {
-      if (res.ok && res.book) { setBook(res.book); cacheBook(); renderAll(); return true; }
-      if (res.ok) bookVersion = 0;   // サーバーに未保存
-      return false;
+      if (!res.ok) return false;
+      canEditShared = !!res.canEditShared;
+      // 共通の名簿が未保存のときは、members.js の初期値を使う(版は0のまま)
+      setBook(res.shared || { members: SEED.members, version: 0 }, res.personal || { members: [], groups: [], version: 0 });
+      cacheBook(); renderAll();
+      return true;
     }).catch(function () { return false; });
   }
 
-  // 保存(全員で共有)。他の人が先に保存していた場合は、上書きせずにエラーにする
-  function persistBook(b) {
-    var members = b.members.map(function (m) { return { id: m.id.trim().toLowerCase(), name: m.name.trim(), kind: m.kind }; });
-    var have = {}; members.forEach(function (m) { have[m.id] = true; });
-    var groups = b.groups.map(function (g) {
+  function normMembers(list) {
+    return list.map(function (m) { return { id: m.id.trim().toLowerCase(), name: m.name.trim(), kind: m.kind }; });
+  }
+  function conflictError() {
+    var e = new Error('他の方(または別の端末)が先にアドレス帳を更新しました。最新の内容を読み込み直してください');
+    e.conflict = true; return e;
+  }
+
+  // 各自の追加分(追加メンバーとグループ)を保存。このGASだけに保存され、他の人には見えない
+  function persistPersonal(members, groups) {
+    members = normMembers(members);
+    var have = {}; MEMBERS.forEach(function (m) { have[m.id] = true; }); members.forEach(function (m) { have[m.id] = true; });
+    groups = groups.map(function (g) {
       var seen = {}, ids = [];
       g.ids.forEach(function (id) { id = String(id).trim().toLowerCase(); if (have[id] && !seen[id]) { seen[id] = true; ids.push(id); } });
       return { name: g.name.trim(), ids: ids };
     });
-    return callApi('saveBook', { members: members, groups: groups, baseVersion: bookVersion }).then(function (res) {
+    return callApi('saveBook', { members: members, groups: groups, baseVersion: PERSONAL.version }).then(function (res) {
       if (res.ok) {
-        setBook({ members: members, groups: groups, version: res.version });
-        cacheBook(); renderAll();
+        var shared = {}; SHARED.members.forEach(function (m) { shared[m.id] = true; });
+        PERSONAL = { members: members.filter(function (m) { return !shared[m.id]; }), groups: groups, version: res.version };
+        rebuild(); cacheBook(); renderAll();
         return res;
       }
-      if (res.code === 'conflict') {
-        var e = new Error('他の方が先にアドレス帳を更新しました。最新の内容を読み込み直してください');
-        e.conflict = true; throw e;
-      }
+      if (res.code === 'conflict') throw conflictError();
       throw new Error(res.error || 'アドレス帳を保存できませんでした');
+    });
+  }
+
+  // 共通の名簿を保存(管理者だけ。全員に反映される)
+  function persistShared(members) {
+    members = normMembers(members);
+    return callApi('saveSharedBook', { members: members, baseVersion: SHARED.version }).then(function (res) {
+      if (res.ok) {
+        SHARED = { members: members, version: res.version };
+        rebuild(); cacheBook(); renderAll();
+        return res;
+      }
+      if (res.code === 'conflict') throw conflictError();
+      throw new Error(res.error || '共通の名簿を保存できませんでした');
     });
   }
 
@@ -770,8 +816,8 @@ window.Recur = (function () {
     return new Promise(function (resolve) {
       setTimeout(function () {
         if (action === 'ping') return resolve({ ok: true });
-        if (action === 'getBook') return resolve({ ok: true, book: null });
-        if (action === 'saveBook') return resolve({ ok: true, version: (Number(p.baseVersion) || 0) + 1 });
+        if (action === 'getBook') return resolve({ ok: true, shared: null, personal: null, canEditShared: true });
+        if (action === 'saveBook' || action === 'saveSharedBook') return resolve({ ok: true, version: (Number(p.baseVersion) || 0) + 1 });
         if (action === 'create') {
           if (!p.allDay) {
             var sMs = Date.parse(p.start), eMs = Date.parse(p.end), day = p.start.slice(0, 10), ign = {};
@@ -831,7 +877,8 @@ window.Recur = (function () {
       maxAbsent: Number($('#maxAbsent').value),
       skipLunch: $('#skipLunch').checked,
       excludeHolidays: $('#excludeHolidays').checked,
-      includeWeekend: $('#includeWeekend').checked
+      includeWeekend: $('#includeWeekend').checked,
+      ignoreAllDay: $('#ignoreAllDay').checked
     };
     if (!payload.startDate || !payload.endDate) { showResultsMessage('日付を入力してください'); return; }
     if (payload.endDate < payload.startDate) { showResultsMessage('終了日が開始日より前になっています'); return; }
@@ -870,6 +917,11 @@ window.Recur = (function () {
         errIds.map(function (id) {
           return '<li>' + esc(nameOf(id)) + ' <span class="em">' + esc(id) + ' — ' + esc(errText(res.errors[id])) + '</span></li>';
         }).join('') + '</ul></div>';
+    }
+    var approxIds = res.approx || [];
+    if (approxIds.length) {
+      html += '<div class="notice info"><b>次の方は、終日の予定を「丸一日の埋まり」から推定して除いています</b>(予定の詳細が読めないため)<ul>' +
+        approxIds.map(function (id) { return '<li>' + esc(nameOf(id)) + '</li>'; }).join('') + '</ul></div>';
     }
     var full = slots.filter(function (s) { return s.busy.length === 0; }).length;
     html += '<div class="summary"><b>候補 ' + slots.length + '枠</b>' +
@@ -1137,13 +1189,15 @@ window.Recur = (function () {
   }
 
   /* ---------- アドレス帳の編集画面 ---------- */
-  var draft = null, activeG = 0, keySeq = 0;
+  var draft = null, activeG = 0, keySeq = 0, editMode = 'personal';
 
   function newK() { keySeq += 1; return 'k' + keySeq; }
 
-  function draftFrom(members, groups) {
+  // members = 編集できる行(各自の追加分、または共通の名簿)。shared = 参照だけの共通の名簿(各自の追加分を編集するとき)
+  function draftFrom(members, groups, shared) {
     var kOf = {};
-    var d = { members: members.map(function (m) { var k = newK(); kOf[m.id] = k; return { k: k, id: m.id, name: m.name, kind: m.kind }; }) };
+    var d = { shared: (shared || []).map(function (m) { var k = newK(); kOf[m.id] = k; return { k: k, id: m.id, name: m.name, kind: m.kind }; }) };
+    d.members = members.map(function (m) { var k = newK(); kOf[m.id] = k; return { k: k, id: m.id, name: m.name, kind: m.kind }; });
     d.groups = groups.map(function (g) {
       return { name: g.name, ks: g.ids.filter(function (id) { return kOf[id]; }).map(function (id) { return kOf[id]; }) };
     });
@@ -1157,9 +1211,29 @@ window.Recur = (function () {
     if (name === 'groups') renderBookGroups();
   }
 
-  function openBook() {
+  function allDraft() { return draft.shared.concat(draft.members); }
+
+  // 編集画面の見た目を、編集中の対象(各自の追加分 / 共通の名簿)に合わせる
+  function applyMode() {
+    var shared = editMode === 'shared';
+    $('#bkTitle').textContent = shared ? '共通の名簿の編集(全員に共有されます)' : 'アドレス帳の編集(あなた専用の追加分)';
+    $('#tabGroups').style.display = shared ? 'none' : '';
+    $('#bkReset').style.display = shared ? '' : 'none';
+    var mb = $('#bkMode');
+    mb.style.display = canEditShared ? '' : 'none';
+    mb.textContent = shared ? '← 自分の追加分の編集に戻る' : '共通の名簿を編集する(管理者)';
+    $('#bkBanner').innerHTML = shared
+      ? '<b>共通の名簿</b>は、このアプリを使う全員が同じ内容を見ます(メンバーのみ。グループは含めません)。「保存」で全員に反映されます。'
+      : '<b>共通の名簿 ' + SHARED.members.length + '名</b>は全員で共通です' + (canEditShared ? '(あなたは管理者として変更できます)' : '(変更できるのは管理者だけです)') +
+        '。ここで追加するメンバーとグループは、<b>あなた専用</b>で、他の人には表示されません。';
+    $('#bmCount').style.display = '';
+  }
+
+  function openBook(mode) {
     refreshBook().then(function () {
-      draft = draftFrom(MEMBERS, GROUPS);
+      editMode = (mode === 'shared' && canEditShared) ? 'shared' : 'personal';
+      draft = editMode === 'shared' ? draftFrom(SHARED.members, [], []) : draftFrom(PERSONAL.members, PERSONAL.groups, SHARED.members);
+      applyMode();
       activeG = 0;
       $('#bmQ').value = ''; $('#bgQ').value = ''; $('#bmPasteText').value = '';
       $('#bmPasteBox').style.display = 'none';
@@ -1176,13 +1250,15 @@ window.Recur = (function () {
   // 入力チェック(保存時と、入力のたびの色付けで共用)
   function validateDraft() {
     var res = { members: {}, groups: {}, first: '' };
-    var ctrl = /[\u0000-\u001f\u007f]/, seen = {};
+    var ctrl = /[\u0000-\u001f\u007f]/, seen = {}, sharedIds = {};
+    draft.shared.forEach(function (m) { sharedIds[m.id.trim().toLowerCase()] = true; seen[m.id.trim().toLowerCase()] = true; });
     draft.members.forEach(function (m, i) {
       if (isBlank(m)) return;
       var id = m.id.trim().toLowerCase(), name = m.name.trim(), e = null;
       if (!name) e = { f: 'name', msg: '名前を入力してください' };
       else if (name.length > 40 || ctrl.test(name)) e = { f: 'name', msg: '名前は40文字以内で入力してください' };
       else if (!EMAIL_RE.test(id) || id.length > 100) e = { f: 'id', msg: 'メールアドレスの形式が正しくありません' };
+      else if (sharedIds[id]) e = { f: 'id', msg: '共通の名簿に登録済みです' };
       else if (seen[id]) e = { f: 'id', msg: 'メールアドレスが重複しています' };
       if (!e) seen[id] = true;
       else { res.members[m.k] = e; if (!res.first) res.first = 'メンバー' + (i + 1) + '行目: ' + e.msg; }
@@ -1233,16 +1309,16 @@ window.Recur = (function () {
         '<option value="room"' + (m.kind === 'room' ? ' selected' : '') + '>会議室・設備</option></select>' +
         '<button type="button" class="xbtn" data-del="' + m.k + '" title="このメンバーを削除">×</button></div>';
     });
-    if (!n) html += '<div class="empty small">該当するメンバーがいません</div>';
+    if (!n) html += '<div class="empty small">' + (draft.members.length ? '該当するメンバーがいません' : (editMode === 'shared' ? 'メンバーがいません。' : '追加したメンバーはまだありません。共通の名簿にいない方を追加するときに使います。')) + '</div>';
     $('#bmList').innerHTML = html;
     var staff = draft.members.filter(function (m) { return m.kind === 'staff' && !isBlank(m); }).length;
     var rooms = draft.members.filter(function (m) { return m.kind === 'room' && !isBlank(m); }).length;
-    $('#bmCount').textContent = '全' + (staff + rooms) + '件(社員 ' + staff + '・会議室/設備 ' + rooms + ')。「保存」を押すまで反映されません。';
+    $('#bmCount').textContent = (editMode === 'shared' ? '共通の名簿: 全' : 'あなたの追加分: 全') + (staff + rooms) + '件(社員 ' + staff + '・会議室/設備 ' + rooms + ')。「保存」を押すまで反映されません。';
     markInvalid();
   }
 
   function groupCount(g) {
-    var ok = {}; draft.members.forEach(function (m) { if (!isBlank(m)) ok[m.k] = true; });
+    var ok = {}; allDraft().forEach(function (m) { if (!isBlank(m)) ok[m.k] = true; });
     return g.ks.filter(function (k) { return ok[k]; }).length;
   }
 
@@ -1267,7 +1343,7 @@ window.Recur = (function () {
     var g = draft.groups[activeG]; if (!g) return;
     var q = $('#bgQ').value.trim().toLowerCase(), html = '';
     [['staff', '社員'], ['room', '会議室・設備']].forEach(function (kd) {
-      var list = draft.members.filter(function (m) {
+      var list = allDraft().filter(function (m) {
         return !isBlank(m) && m.kind === kd[0] && (!q || m.name.toLowerCase().indexOf(q) >= 0 || m.id.toLowerCase().indexOf(q) >= 0);
       });
       if (!list.length) return;
@@ -1311,7 +1387,7 @@ window.Recur = (function () {
 
   function pasteGo() {
     var r = parsePaste($('#bmPasteText').value), kind = $('#bmPasteKind').value;
-    var have = {}; draft.members.forEach(function (m) { have[m.id.trim().toLowerCase()] = true; });
+    var have = {}; allDraft().forEach(function (m) { have[m.id.trim().toLowerCase()] = true; });
     var add = [], dup = 0;
     r.rows.forEach(function (x) {
       if (have[x.id]) { dup++; return; }
@@ -1319,7 +1395,7 @@ window.Recur = (function () {
     });
     draft.members = add.concat(draft.members);
     $('#bmPasteText').value = ''; $('#bmPasteBox').style.display = 'none'; $('#bmQ').value = '';
-    var msg = add.length + '件を追加しました。' + (dup ? ' 登録済みのため' + dup + '件を除きました。' : '') +
+    var msg = add.length + '件を追加しました。' + (dup ? ' 登録済み(共通の名簿を含む)のため' + dup + '件を除きました。' : '') +
       (r.skipped ? ' メールアドレスが読み取れない' + r.skipped + '行(見出し行など)は読み飛ばしました。' : '');
     var box = $('#bmMsg'); box.textContent = msg; box.classList.toggle('warn', !add.length);
     renderBookMembers();
@@ -1329,15 +1405,17 @@ window.Recur = (function () {
     var v = markInvalid();
     if (v.first) { $('#bkErr').textContent = v.first; return; }
     var members = draft.members.filter(function (m) { return !isBlank(m); });
-    var idOf = {}; members.forEach(function (m) { idOf[m.k] = m.id.trim().toLowerCase(); });
+    var idOf = {}; allDraft().forEach(function (m) { if (!isBlank(m)) idOf[m.k] = m.id.trim().toLowerCase(); });
     var groups = draft.groups.map(function (g) {
       return { name: g.name, ids: g.ks.filter(function (k) { return idOf[k]; }).map(function (k) { return idOf[k]; }) };
     });
     var ok = $('#bkSave'); ok.disabled = true; ok.textContent = '保存しています…';
     $('#bkErr').textContent = '';
-    persistBook({ members: members, groups: groups }).then(function () {
+    var shared = editMode === 'shared';
+    (shared ? persistShared(members) : persistPersonal(members, groups)).then(function () {
       $('#bookDlg').close();
-      toast('アドレス帳を保存しました。' + (DEMO ? '(デモ表示のため、この端末内だけに保存しています)' : '(全員に反映されます)'));
+      toast((shared ? '共通の名簿を保存しました。' : 'アドレス帳(あなた専用の追加分)を保存しました。') +
+        (DEMO ? '(デモ表示のため、この端末内だけに保存しています)' : (shared ? '(全員に反映されます)' : '(他の人には表示されません)')));
     }).catch(function (e) {
       ok.disabled = false; ok.textContent = '保存';
       if (e.conflict) {
@@ -1353,16 +1431,17 @@ window.Recur = (function () {
   }
 
   function bindBook() {
-    $('#bookBtn').addEventListener('click', openBook);
+    $('#bookBtn').addEventListener('click', function () { openBook('personal'); });
+    $('#bkMode').addEventListener('click', function () { openBook(editMode === 'shared' ? 'personal' : 'shared'); });
     $('#bookDlg').addEventListener('click', function (e) {
       var t = e.target.closest('.tab'); if (t) switchTab(t.getAttribute('data-tab'));
     });
     $('#bkCancel').addEventListener('click', function () { $('#bookDlg').close(); });
     $('#bkSave').addEventListener('click', saveBookClick);
     $('#bkReset').addEventListener('click', function () {
-      if (!window.confirm('アドレス帳を初期値(members.js の内容)に戻します。\n「保存」を押すまで確定しません。よろしいですか?')) return;
-      draft = draftFrom(SEED.members, SEED.groups); activeG = 0;
-      renderBookMembers(); renderBookGroups(); $('#bkErr').textContent = '';
+      if (!window.confirm('共通の名簿を初期値(members.js の内容)に戻します。\n「保存」を押すまで確定しません。よろしいですか?')) return;
+      draft = draftFrom(SEED.members, [], []); activeG = 0;
+      renderBookMembers(); $('#bkErr').textContent = '';
     });
 
     // メンバー
@@ -1433,7 +1512,7 @@ window.Recur = (function () {
     });
     $('#bgAllStaff').addEventListener('click', function () {
       var g = draft.groups[activeG]; if (!g) return;
-      draft.members.forEach(function (m) { if (m.kind === 'staff' && !isBlank(m) && g.ks.indexOf(m.k) < 0) g.ks.push(m.k); });
+      allDraft().forEach(function (m) { if (m.kind === 'staff' && !isBlank(m) && g.ks.indexOf(m.k) < 0) g.ks.push(m.k); });
       renderGroupMembers(); refreshGroupItem();
     });
     $('#bgClear').addEventListener('click', function () {
@@ -1487,17 +1566,17 @@ window.Recur = (function () {
     });
     $('#saveGroup').addEventListener('click', function () {
       if (!selected.size) { toast('先に参加者を選んでください。'); return; }
-      var name = window.prompt('グループ名を入力してください(選択中の' + selected.size + '名を、全員が使えるグループとして保存します)');
+      var name = window.prompt('グループ名を入力してください(選択中の' + selected.size + '名を、あなた専用のグループとして保存します。他の人には表示されません)');
       if (!name || !name.trim()) return;
       name = name.trim();
       if (name.length > 30) { toast('グループ名は30文字以内にしてください。'); return; }
-      var groups = GROUPS.map(function (g) { return { name: g.name, ids: g.ids.slice() }; });
+      var groups = PERSONAL.groups.map(function (g) { return { name: g.name, ids: g.ids.slice() }; });
       var at = -1; groups.forEach(function (g, i) { if (g.name === name) at = i; });
       if (at >= 0) {
         if (!window.confirm('同じ名前のグループがあります。選択中の参加者で置き換えますか?')) return;
         groups[at].ids = Array.from(selected);
       } else groups.push({ name: name, ids: Array.from(selected) });
-      persistBook({ members: MEMBERS, groups: groups }).then(function () {
+      persistPersonal(PERSONAL.members, groups).then(function () {
         toast('グループ「' + name + '」を保存しました。');
       }).catch(function (e) {
         if (e.conflict) refreshBook().then(function () { toast('他の方が先にアドレス帳を更新したため、最新を読み込みました。もう一度お試しください。'); });
