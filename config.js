@@ -1,8 +1,8 @@
 /*
- * 接続設定
- * GAS_URL に、GASをウェブアプリとしてデプロイしたURL(…/exec)を貼り付けます。
- * 空のままの場合は「デモ表示」(サンプルの予定で画面を確認するモード)になります。
+ * 接続設定(任意)
+ * 通常は空のままで構いません。画面右上の「接続設定」で、各自がご自身のGASのURLを入力します。
+ * 全員が同じGASを使う場合だけ、ここにURL(…/exec)を書くと、入力なしで接続できます。
  */
 window.APP_CONFIG = {
-  GAS_URL: 'https://script.google.com/macros/s/AKfycbzD0QiJQvVwL-cIO2useyl-FKXyyKBxy42X4l_i4PXA9jkkZKp7ll0BpgJ3E2pIDeCPfA/exec'
+  GAS_URL: ''
 };

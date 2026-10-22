@@ -65,7 +65,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .grid input:not([type=checkbox]),.grid select{width:100%;min-width:0}
 .grid .full{grid-column:1/-1}
 label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
-label.f input,label.f select,.dlg input[type=text],.dlg textarea,.dlg input[type=password]{padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);font-size:14px}
+label.f input,label.f select,.dlg input[type=text],.dlg input[type=url],.dlg textarea,.dlg input[type=password]{padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);font-size:14px}
 .checks{display:flex;flex-direction:column;gap:5px;font-size:13px}
 .checks label{display:flex;align-items:center;gap:7px;cursor:pointer}
 .checks input{accent-color:var(--red)}
@@ -174,7 +174,7 @@ dialog.dlg.wide{width:min(780px,96vw)}
   <span class="sub">複数人のGoogleカレンダーから共通の空き時間を探します</span>
   <span class="spacer"></span>
   <span class="badge" id="modeBadge"></span>
-  <button class="btn-ghost" id="keyBtn" type="button">アクセスキー</button>
+  <button class="btn-ghost" id="keyBtn" type="button">接続設定</button>
 </header>
 
 <div class="layout">
@@ -370,9 +370,12 @@ dialog.dlg.wide{width:min(780px,96vw)}
 </dialog>
 
 <dialog class="dlg" id="keyDlg">
-  <div class="hd">アクセスキー</div>
+  <div class="hd">接続設定</div>
   <div class="bd">
-    <div class="small muted">管理者から共有されたアクセスキーを入力してください。この端末のブラウザにのみ保存されます。</div>
+    <div class="small muted">ご自身のGAS(ウェブアプリ)のURLとアクセスキーを入力してください。この端末のブラウザにのみ保存されます。</div>
+    <label class="small" for="urlInput" style="margin-top:6px">GASのURL(…/exec)</label>
+    <input type="url" id="urlInput" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec" inputmode="url">
+    <label class="small" for="keyInput" style="margin-top:6px">アクセスキー</label>
     <input type="password" id="keyInput" autocomplete="off">
     <div class="small" id="keyMsg"></div>
   </div>
@@ -542,8 +545,16 @@ window.Recur = (function () {
   var CFG = window.APP_CONFIG || {};
   var SEED = { members: window.APP_MEMBERS || [], groups: window.APP_GROUPS || [] };   // 初期値(members.js)
   var MEMBERS = [], GROUPS = [], bookVersion = 0;
-  var DEMO = !CFG.GAS_URL || /[?&]demo=1/.test(location.search);
   var LS_KEY = 'schedule-app:v1';
+  var GAS_URL_RE = /^https:\/\/script\.google\.com\/(a\/[A-Za-z0-9.\-]+\/)?macros\/s\/[A-Za-z0-9_\-]+\/exec$/;
+  function readStoredUrl() {
+    try { return String((JSON.parse(localStorage.getItem(LS_KEY)) || {}).gasUrl || '').trim(); } catch (e) { return ''; }
+  }
+  // 接続先: この端末で入力したURLを優先し、なければ config.js の値
+  var GAS_URL = readStoredUrl() || String(CFG.GAS_URL || '').trim();
+  if (GAS_URL && !GAS_URL_RE.test(GAS_URL)) GAS_URL = '';
+  var FORCE_DEMO = /[?&]demo=1/.test(location.search);
+  var DEMO = !GAS_URL || FORCE_DEMO;
   var WD = ['日', '月', '火', '水', '木', '金', '土'];
   var DEMO_HOLIDAYS = { '2026-11-03': true, '2026-11-23': true };
 
@@ -590,8 +601,8 @@ window.Recur = (function () {
     var tomorrow = Date.now() + DAY_MS;
     $('#startDate').value = jstDateStr_(tomorrow);
     $('#endDate').value = jstDateStr_(tomorrow + 13 * DAY_MS);
-    $('#modeBadge').textContent = DEMO ? 'デモ表示(サンプルの予定)' : '接続済み';
-    $('#keyBtn').style.display = DEMO ? 'none' : '';
+    $('#modeBadge').textContent = FORCE_DEMO ? 'デモ表示(サンプルの予定)' : (!GAS_URL ? '未接続(デモ表示)' : '接続済み');
+    $('#keyBtn').style.display = FORCE_DEMO ? 'none' : '';
   }
 
   /* ---------- 参加者 ---------- */
@@ -721,7 +732,7 @@ window.Recur = (function () {
     }
     var body = { action: action, key: key };
     Object.keys(payload || {}).forEach(function (k) { body[k] = payload[k]; });
-    return fetch(CFG.GAS_URL, {
+    return fetch(GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(body)
@@ -1446,6 +1457,7 @@ window.Recur = (function () {
 
   /* ---------- アクセスキー ---------- */
   function openKeyDialog(msg) {
+    $('#urlInput').value = GAS_URL;
     $('#keyInput').value = getKey();
     $('#keyMsg').textContent = msg || '';
     $('#keyDlg').showModal();
@@ -1519,16 +1531,34 @@ window.Recur = (function () {
 
     $('#keyBtn').addEventListener('click', function () { openKeyDialog(''); });
     $('#keyClose').addEventListener('click', function () { $('#keyDlg').close(); });
+    // URLの形式を確認して保存する。URLが変わったときは、画面を読み込み直して接続先を切り替える
+    function saveConn() {
+      var url = $('#urlInput').value.trim();
+      if (url && !GAS_URL_RE.test(url)) {
+        $('#keyMsg').textContent = 'URLが正しくありません。「https://script.google.com/macros/s/…/exec」の形で入力してください。';
+        return null;
+      }
+      saveStore({ gasUrl: url, accessKey: $('#keyInput').value.trim() });
+      return url !== GAS_URL ? 'changed' : 'same';
+    }
     $('#keySave').addEventListener('click', function () {
-      saveStore({ accessKey: $('#keyInput').value.trim() });
-      $('#keyDlg').close(); toast('アクセスキーを保存しました。'); refreshBook();
+      var r = saveConn();
+      if (!r) return;
+      $('#keyDlg').close();
+      if (r === 'changed') { location.reload(); return; }
+      toast('接続設定を保存しました。'); refreshBook();
     });
     $('#keyTest').addEventListener('click', function () {
-      saveStore({ accessKey: $('#keyInput').value.trim() });
+      var url = $('#urlInput').value.trim();
+      if (!url) { $('#keyMsg').textContent = 'GASのURLを入力してください。'; return; }
+      if (!GAS_URL_RE.test(url)) { $('#keyMsg').textContent = 'URLが正しくありません。「https://script.google.com/macros/s/…/exec」の形で入力してください。'; return; }
+      if (!$('#keyInput').value.trim()) { $('#keyMsg').textContent = 'アクセスキーを入力してください。'; return; }
       $('#keyMsg').textContent = '接続を確認しています…';
-      callApi('ping', {}).then(function (r) {
-        $('#keyMsg').textContent = r.ok ? '接続できました。' : (r.error || '接続できませんでした');
-      }).catch(function (e) { $('#keyMsg').textContent = e.message; });
+      fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'ping', key: $('#keyInput').value.trim() }) })
+        .then(function (r) { return r.json(); })
+        .then(function (r) { $('#keyMsg').textContent = r.ok ? '接続できました。「保存」を押してください。' : (r.error || '接続できませんでした'); })
+        .catch(function () { $('#keyMsg').textContent = 'サーバーに接続できませんでした。URLと、ウェブアプリの公開設定(アクセスできるユーザー=全員)を確認してください'; });
     });
   }
 
@@ -1541,7 +1571,9 @@ window.Recur = (function () {
   renderGroups(); renderMembers(); renderSelSummary(); bind(); bindBook();
   refreshBook();
   showResultsMessage('条件を決めて「空き時間を探す」を押してください',
-    DEMO ? 'いまはデモ表示です(サンプルの予定で動作を確認できます)。' : '選んだ参加者全員が空いている日時を一覧にします。');
+    FORCE_DEMO ? 'いまはデモ表示です(サンプルの予定で動作を確認できます)。'
+      : (!GAS_URL ? '右上の「接続設定」で、ご自身のGASのURLとアクセスキーを入力してください(それまではサンプル表示です)。'
+      : '選んだ参加者全員が空いている日時を一覧にします。'));
 
   // ホーム画面に追加できるようにするための登録(https または localhost のときだけ。失敗しても画面の動作には影響しません)
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
